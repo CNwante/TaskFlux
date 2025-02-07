@@ -10,6 +10,11 @@ export const TaskFlux = () => {
   const [expanded, setExpanded] = useImmer(false);
 
   const handleAddTask = (taskTitle) => {
+    if(taskTitle.trim() === "") {
+      alert("Please, enter your task.");
+      return taskTitle;
+    }
+
     updateTasks((draft) => {
       draft.push({
         id: nextId++,
