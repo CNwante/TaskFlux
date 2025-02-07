@@ -1,47 +1,39 @@
-import { useImmer } from "use-immer";
+import { useImmer, useImmerReducer } from "use-immer";
 import { AddTask } from "./AddTask";
 import { TaskList } from "./TaskList";
+import { taskReducer } from "./taskReducer";
 
 let nextId = 1;
 const initialTasks = [{ id: 0, title: "Placeholder task", done: true }];
 
 export const TaskFlux = () => {
-  const [tasks, updateTasks] = useImmer(initialTasks);
+  const [tasks, dispatch] = useImmerReducer(taskReducer, initialTasks);
   const [expanded, setExpanded] = useImmer(false);
 
   const handleAddTask = (taskTitle) => {
-    if(taskTitle.trim() === "") {
-      alert("Please, enter your task.");
-      return taskTitle;
-    }
+    dispatch({
+      type: "ADD_TASK",
+      id: nextId++,
+      title: taskTitle,
+    });
+  };
 
-    updateTasks((draft) => {
-      draft.push({
-        id: nextId++,
-        title: taskTitle,
-        done: false,
-      });
+  const handleChangeTask = (nextTask) => {
+    dispatch({
+      type: "CHANGE_TASK",
+      task: nextTask,
+    });
+  };
+
+  const handleDeleteTask = (taskId) => {
+    dispatch({
+      type: "DELETE_TASK",
+      id: taskId,
     });
   };
 
   const handleExpansion = (isExpanded) => {
     setExpanded(isExpanded);
-  };
-
-  const handleChangeTask = (nextTask) => {
-    updateTasks(
-      tasks.map((task) => {
-        return task.id === nextTask.id ? nextTask : task;
-      })
-    );
-    setExpanded(expanded);
-  };
-
-  const handleDeleteTask = (taskId) => {
-    updateTasks((draft) => {
-      const index = draft.findIndex((t) => t.id === taskId);
-      draft.splice(index, 1);
-    });
   };
 
   return (
